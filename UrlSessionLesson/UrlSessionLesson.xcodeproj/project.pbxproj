@@ -16,6 +16,8 @@
 		14BF1F4B23728A1900937E1C /* ImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BF1F4A23728A1900937E1C /* ImageModel.swift */; };
 		14BF1F4E23728A9C00937E1C /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BF1F4D23728A9C00937E1C /* NetworkService.swift */; };
 		14E6F855237326C600977C9F /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E6F854237326C600977C9F /* API.swift */; };
+		CCA0ABDE23889C000010C5F1 /* UrlSessionLesson.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CCA0ABDC23889C000010C5F1 /* UrlSessionLesson.xcdatamodeld */; };
+		CCA0AC012388AC2A0010C5F1 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA0AC002388AC2A0010C5F1 /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		14BF1F4A23728A1900937E1C /* ImageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageModel.swift; sourceTree = "<group>"; };
 		14BF1F4D23728A9C00937E1C /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		14E6F854237326C600977C9F /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		CCA0ABDD23889C000010C5F1 /* UrlSessionLesson.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = UrlSessionLesson.xcdatamodel; sourceTree = "<group>"; };
+		CCA0AC002388AC2A0010C5F1 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +75,7 @@
 				14582C622372962E00E279CF /* Launch Screen.storyboard */,
 				14BF1F3D237289C300937E1C /* Assets.xcassets */,
 				14BF1F42237289C300937E1C /* Info.plist */,
+				CCA0ABDC23889C000010C5F1 /* UrlSessionLesson.xcdatamodeld */,
 			);
 			path = UrlSessionLesson;
 			sourceTree = "<group>";
@@ -79,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				14BF1F38237289C200937E1C /* ViewController.swift */,
+				CCA0AC002388AC2A0010C5F1 /* DetailViewController.swift */,
 				14BF1F48237289DD00937E1C /* Interactor.swift */,
 			);
 			path = Module;
@@ -157,6 +163,8 @@
 				14BF1F39237289C200937E1C /* ViewController.swift in Sources */,
 				14BF1F4B23728A1900937E1C /* ImageModel.swift in Sources */,
 				14BF1F35237289C200937E1C /* AppDelegate.swift in Sources */,
+				CCA0AC012388AC2A0010C5F1 /* DetailViewController.swift in Sources */,
+				CCA0ABDE23889C000010C5F1 /* UrlSessionLesson.xcdatamodeld in Sources */,
 				14BF1F49237289DD00937E1C /* Interactor.swift in Sources */,
 				14BF1F4E23728A9C00937E1C /* NetworkService.swift in Sources */,
 				14582C612372916000E279CF /* SessionFactory.swift in Sources */,
@@ -337,6 +345,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		CCA0ABDC23889C000010C5F1 /* UrlSessionLesson.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CCA0ABDD23889C000010C5F1 /* UrlSessionLesson.xcdatamodel */,
+			);
+			currentVersion = CCA0ABDD23889C000010C5F1 /* UrlSessionLesson.xcdatamodel */;
+			path = UrlSessionLesson.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 14BF1F29237289C200937E1C /* Project object */;
 }

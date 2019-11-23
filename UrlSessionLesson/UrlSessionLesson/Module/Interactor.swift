@@ -9,7 +9,7 @@
 import UIKit
 
 protocol InteractorInput {
-	func loadImage(at path: String, completion: @escaping (UIImage?) -> Void)
+	func loadImage(at path: String, completion: @escaping (Data?) -> Void)
 	func loadImageList(by searchString: String, completion: @escaping ([ImageModel]) -> Void)
 }
 
@@ -20,13 +20,13 @@ class Interactor: InteractorInput {
 		self.networkService = networkService
 	}
 
-	func loadImage(at path: String, completion: @escaping (UIImage?) -> Void) {
+	func loadImage(at path: String, completion: @escaping (Data?) -> Void) {
 		networkService.getData(at: path, parameters: nil) { data in
 			guard let data = data else {
 				completion(nil)
 				return
 			}
-			completion(UIImage(data: data))
+			completion(data)
 		}
 	}
 
