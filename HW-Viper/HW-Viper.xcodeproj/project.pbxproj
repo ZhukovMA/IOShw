@@ -14,7 +14,18 @@
 		CC54A29B237854720042396E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC54A299237854720042396E /* LaunchScreen.storyboard */; };
 		CC54A2A32378548B0042396E /* Presenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC54A2A22378548B0042396E /* Presenter.swift */; };
 		CC54A2A5237854980042396E /* Interactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC54A2A4237854970042396E /* Interactor.swift */; };
+		CCCCD7C6238AFEEA00502CFB /* HW_ViperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCCD7C5238AFEEA00502CFB /* HW_ViperTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CCCCD7C8238AFEEA00502CFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC54A285237854710042396E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC54A28C237854710042396E;
+			remoteInfo = "HW-Viper";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		CC2ADBB72378C08C0043C4B9 /* Configurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configurator.swift; sourceTree = "<group>"; };
@@ -26,10 +37,20 @@
 		CC54A29C237854720042396E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC54A2A22378548B0042396E /* Presenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presenter.swift; sourceTree = "<group>"; };
 		CC54A2A4237854970042396E /* Interactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interactor.swift; sourceTree = "<group>"; };
+		CCCCD7C3238AFEEA00502CFB /* HW-ViperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HW-ViperTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCCCD7C5238AFEEA00502CFB /* HW_ViperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HW_ViperTests.swift; sourceTree = "<group>"; };
+		CCCCD7C7238AFEEA00502CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		CC54A28A237854710042396E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCCCD7C0238AFEEA00502CFB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -43,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				CC54A28F237854710042396E /* HW-Viper */,
+				CCCCD7C4238AFEEA00502CFB /* HW-ViperTests */,
 				CC54A28E237854710042396E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -51,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				CC54A28D237854710042396E /* HW-Viper.app */,
+				CCCCD7C3238AFEEA00502CFB /* HW-ViperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,6 +91,15 @@
 				CC54A29C237854720042396E /* Info.plist */,
 			);
 			path = "HW-Viper";
+			sourceTree = "<group>";
+		};
+		CCCCD7C4238AFEEA00502CFB /* HW-ViperTests */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCD7C5238AFEEA00502CFB /* HW_ViperTests.swift */,
+				CCCCD7C7238AFEEA00502CFB /* Info.plist */,
+			);
+			path = "HW-ViperTests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -90,6 +122,24 @@
 			productReference = CC54A28D237854710042396E /* HW-Viper.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CCCCD7C2238AFEEA00502CFB /* HW-ViperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CCCCD7CC238AFEEA00502CFB /* Build configuration list for PBXNativeTarget "HW-ViperTests" */;
+			buildPhases = (
+				CCCCD7BF238AFEEA00502CFB /* Sources */,
+				CCCCD7C0238AFEEA00502CFB /* Frameworks */,
+				CCCCD7C1238AFEEA00502CFB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CCCCD7C9238AFEEA00502CFB /* PBXTargetDependency */,
+			);
+			name = "HW-ViperTests";
+			productName = "HW-ViperTests";
+			productReference = CCCCD7C3238AFEEA00502CFB /* HW-ViperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -102,6 +152,10 @@
 				TargetAttributes = {
 					CC54A28C237854710042396E = {
 						CreatedOnToolsVersion = 10.3;
+					};
+					CCCCD7C2238AFEEA00502CFB = {
+						CreatedOnToolsVersion = 10.3;
+						TestTargetID = CC54A28C237854710042396E;
 					};
 				};
 			};
@@ -119,6 +173,7 @@
 			projectRoot = "";
 			targets = (
 				CC54A28C237854710042396E /* HW-Viper */,
+				CCCCD7C2238AFEEA00502CFB /* HW-ViperTests */,
 			);
 		};
 /* End PBXProject section */
@@ -130,6 +185,13 @@
 			files = (
 				CC54A29B237854720042396E /* LaunchScreen.storyboard in Resources */,
 				CC54A298237854720042396E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCCCD7C1238AFEEA00502CFB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,7 +210,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CCCCD7BF238AFEEA00502CFB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCCCD7C6238AFEEA00502CFB /* HW_ViperTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CCCCD7C9238AFEEA00502CFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC54A28C237854710042396E /* HW-Viper */;
+			targetProxy = CCCCD7C8238AFEEA00502CFB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		CC54A299237854720042396E /* LaunchScreen.storyboard */ = {
@@ -312,6 +390,44 @@
 			};
 			name = Release;
 		};
+		CCCCD7CA238AFEEA00502CFB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "HW-ViperTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Maxim.HW-ViperTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HW-Viper.app/HW-Viper";
+			};
+			name = Debug;
+		};
+		CCCCD7CB238AFEEA00502CFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "HW-ViperTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Maxim.HW-ViperTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HW-Viper.app/HW-Viper";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -329,6 +445,15 @@
 			buildConfigurations = (
 				CC54A2A0237854720042396E /* Debug */,
 				CC54A2A1237854720042396E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CCCCD7CC238AFEEA00502CFB /* Build configuration list for PBXNativeTarget "HW-ViperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CCCCD7CA238AFEEA00502CFB /* Debug */,
+				CCCCD7CB238AFEEA00502CFB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -18,14 +18,17 @@ class Interactor: InteractorInput {
     
  
     func downloadImage() {
+        let methodStart = Date()
         getData { image, error in
             self.output?.setImage(data: image)
         }
+        let methodFinish = Date()
+        let executionTime = methodFinish.timeIntervalSince(methodStart)
+        print("Execution time: \(executionTime)")
     }
     
     func getData(completion: @escaping (Data?, Error?) -> Void) {
         guard let url = URL(string:"http://icons.iconarchive.com/icons/dtafalonso/ios8/512/Calendar-icon.png") else { return }
-        
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let currentError = error {
                 completion(nil, currentError)
@@ -37,6 +40,7 @@ class Interactor: InteractorInput {
         }
         
         task.resume()
+        
     }
 }
 
