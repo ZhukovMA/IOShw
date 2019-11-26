@@ -14,23 +14,24 @@ protocol URLSessionProtocol {
 
 protocol InteractorInput {
     func downloadImage()
+    func clearCash()
+    var cash: Data? { get set }
 }
 
 extension URLSession: URLSessionProtocol {}
+
 
 class Interactor: InteractorInput {
     
     var output : InteractorOutput?
     var urlSession: URLSessionProtocol = URLSession.shared
+    var cash: Data?
     
     func downloadImage() {
-        let methodStart = Date()
         getData { image, error in
-            self.output?.setImage(data: image)
+            self.cash = image
+            self.output?.notifyAboutDownload(data: self.cash)
         }
-        let methodFinish = Date()
-        let executionTime = methodFinish.timeIntervalSince(methodStart)
-        print("Execution time: \(executionTime)")
     }
     
     func getData(completion: @escaping (Data?, Error?) -> Void) {
@@ -40,16 +41,19 @@ class Interactor: InteractorInput {
                 completion(nil, currentError)
                 return
             }
-            
             guard let currentData = data else { return }
             completion(currentData, nil)
         }
-        
         task.resume()
-        
+    }
+    
+    func clearCash() {
+        self.cash = nil
+        output?.notifyAboutClearCash()
     }
 }
 
 protocol InteractorOutput {
-    func setImage(data: Data?)
+    func notifyAboutDownload(data: Data?)
+    func notifyAboutClearCash()
 }

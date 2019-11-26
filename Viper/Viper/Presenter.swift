@@ -15,21 +15,22 @@ protocol PresenterInput {
 }
 
 class Presenter: PresenterInput, InteractorOutput {
-    
-    
+
     var output: PresenterOutput?
     var interactor: InteractorInput?
-    var cash: Data?
     
     // MARK:- from interactor
     
-    func setImage(data: Data?) {
-        if let data = data {
-            cash = data
+    func notifyAboutDownload(data: Data?) {
+        if let _ = data {
             output?.showAlertView(withTitle: "Успешно", andText: "Изображение загружено")
         } else {
             output?.showAlertView(withTitle: "Ошибка", andText: "Не удалось загрузить изображение")
         }
+    }
+    
+    func notifyAboutClearCash() {
+        output?.showAlertView(withTitle: "Успешно", andText: "Кэш очищен")
     }
     
     // MARK:- from view
@@ -39,7 +40,7 @@ class Presenter: PresenterInput, InteractorOutput {
     }
     
     func getImageFromCash() {
-        if let cash = cash {
+        if let cash = interactor?.cash {
             output?.showImage(with: UIImage(data: cash)!)
         } else {
             output?.showAlertView(withTitle: "Ошибка", andText: "Кэш пустой")
@@ -47,10 +48,10 @@ class Presenter: PresenterInput, InteractorOutput {
     }
     
     func clearCash() {
-        self.cash = nil
-        output?.showImage(with: nil)
-        output?.showAlertView(withTitle: "Успешно", andText: "Кэш очищен")
+        interactor?.clearCash()
     }
+    
+    
 }
 
 protocol PresenterOutput {
