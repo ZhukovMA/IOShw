@@ -18,12 +18,15 @@ protocol LocationManagerDelegate {
 
 
 class GeopositionManager: NSObject {
+    var apiManager: APIManagerProtocol!
+    var coreDataManager = CoreDataManager()
     var delegate: LocationManagerDelegate?
     var locationManager = CLLocationManager()
     var currentLocation:CLLocation!
     
     override init() {
         super.init()
+        apiManager = APIManager()
         checkLocation()
     }
     
@@ -56,26 +59,25 @@ class GeopositionManager: NSObject {
                     {
                         if let localion = place.locality
                         {
-                            let url = APIManager.getPath(latitude: String(self.currentLocation.coordinate.latitude), longitude: String(self.currentLocation.coordinate.longitude))
-                            NetworkService.getData(url: url, location: localion, completion: { (results) in
+                            let url = self.apiManager.getPath(latitude: String(self.currentLocation.coordinate.latitude), longitude: String(self.currentLocation.coordinate.longitude))
+                            NetworkService.getData(url: url, location: localion, longitude: String(self.currentLocation.coordinate.longitude), latitude: String(self.currentLocation.coordinate.latitude), completion: { (results) in
                                 guard var result = results else {return}
-                                
+                                let desWeatherObject = result["description"]![0] as! DescriptionLocationModel
                                 var currentWeatherObject = result["current"]![0] as! CurrentWeatherModel
-                                let favoritesArray = CoreDataManager.retrieveData()
-                                let filteredArray = favoritesArray.filter( { (user: Weather) -> Bool in
-                                    return user.locationName == currentWeatherObject.location
-                                })
-                                if !filteredArray.isEmpty {
-                                    currentWeatherObject.isFavorite = true
-                                    result["current"]![0] = currentWeatherObject
-                                    DispatchQueue.main.async {
-                                        self.delegate?.setDataFromLocationManager(data: result)
-                                    }
-                                } else {
-                                    DispatchQueue.main.async {
-                                        self.delegate?.setDataFromLocationManager(data: result)
+                                DispatchQueue.main.async {
+                                    let favoritesArray = self.coreDataManager.retrieveData()
+                                    let filteredArray = favoritesArray.filter( { (user: Weather) -> Bool in
+                                        return user.locationName == desWeatherObject.location
+                                    })
+                                    if !filteredArray.isEmpty {
+                                        currentWeatherObject.isFavorite = true
+                                        result["current"]![0] = currentWeatherObject
+                                            self.delegate?.setDataFromLocationManager(data: result)
+                                    } else {
+                                            self.delegate?.setDataFromLocationManager(data: result)
                                     }
                                 }
+                                
                                 
                             })
                             

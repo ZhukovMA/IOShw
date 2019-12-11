@@ -10,18 +10,19 @@ import UIKit
 import CoreLocation
 import CoreData
 
-protocol SearchAndBookmarkOutput {
+protocol SearchAndBookmarkDelegate: AnyObject {
     func setData(data: [String: [Any]])
 }
 
 class SearchAndBookmarkController: UIViewController, MainControllerOutput {
-    
+    var apiManager: APIManagerProtocol!
+    var coreDataManager : CoreDataManagerProtocol!
     var favoritesArray : [Weather] = []
-    let coreDataManager = CoreDataManager()
-    var output : SearchAndBookmarkOutput?
+    weak var delegate : SearchAndBookmarkDelegate?
     var mainViewController : MainViewController?
     var searchBar: UISearchBar!
-    let tableView = UITableView()
+    var tableView = UITableView()
+    var geocoder : CLGeocoder!
     
     func retrieveData(data: [Weather]) {
         favoritesArray = data
@@ -31,9 +32,10 @@ class SearchAndBookmarkController: UIViewController, MainControllerOutput {
         tableView.beginUpdates()
         var weatherObject =  data
         var currentWeatherObject = weatherObject["current"]![0] as! CurrentWeatherModel
+        let desWeatherObject = weatherObject["description"]![0] as! DescriptionLocationModel
         if currentWeatherObject.isFavorite {
             
-            CoreDataManager.removeData(locationName: currentWeatherObject.location) { (results) in
+            coreDataManager.removeData(locationName: desWeatherObject.location) { (results) in
                 if let result = results {
                     self.favoritesArray = result
                     let indexPath = IndexPath(row: self.favoritesArray.count, section: 0)
@@ -46,7 +48,7 @@ class SearchAndBookmarkController: UIViewController, MainControllerOutput {
             currentWeatherObject.isFavorite = true
             weatherObject["current"]![0] = currentWeatherObject
             let indexPath = IndexPath(row: favoritesArray.count, section: 0)
-            CoreDataManager.saveAsEntity(data: weatherObject) { (result) in
+            coreDataManager.saveAsEntity(data: weatherObject) { (result) in
                 if let result = result {
                     self.tableView.insertRows(at: [indexPath], with: .fade)
                     self.favoritesArray = result
@@ -57,11 +59,37 @@ class SearchAndBookmarkController: UIViewController, MainControllerOutput {
         return weatherObject
     }
     
+    func updateCurrentWeatherForFavorites() {
+        for currentItem in 0...(favoritesArray.count-1) {
+            print("for currentItem in 0\(currentItem)--------------------------", Thread.current)
+            let item = favoritesArray[currentItem]
+            let url = apiManager.getPath(latitude: item.latitude!, longitude: item.longitude!)
+            
+            NetworkService.getData(url: url, location: item.locationName!, longitude: item.longitude!, latitude: item.latitude!) { (results) in
+                print("NetworkService.getData(\(currentItem)--------------------------", Thread.current)
+                
+                
+                print(self.description)
+                self.coreDataManager.update(data: results!, completion: { (result) in
+                    print("self.coreDataManager.update(\(currentItem)--------------------------", Thread.current)
+                    
+                    print("1",self.favoritesArray.count)
+                    self.favoritesArray[currentItem] = result!
+                    
+                    
+                })
+            }
+        }
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        favoritesArray = CoreDataManager.retrieveData()
+        coreDataManager = CoreDataManager()
+        favoritesArray = coreDataManager.retrieveData()
+        geocoder = CLGeocoder()
+        tableView.reloadData()
+        apiManager = APIManager()
         tableView.tableFooterView = UIView()
         searchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 45))
         tableView.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
@@ -72,16 +100,17 @@ class SearchAndBookmarkController: UIViewController, MainControllerOutput {
         tableView.dataSource = self
         mainViewController!.output = self
         searchBar.delegate = self
+        coreDataManager = CoreDataManager()
         view.addSubview(tableView)
     }
     
     
-    private func setupNavigationBarItem() {
+    func setupNavigationBarItem() {
         self.title = "Избранное"
         navigationController?.navigationBar.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
         UIApplication.shared.statusBarView?.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(action))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "back100"), style: .done, target: self, action: #selector(action))
     }
     
     @objc func action() {
@@ -105,47 +134,52 @@ class SearchAndBookmarkController: UIViewController, MainControllerOutput {
             alertController.addAction(UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction) in
                 
             })
-            
             self.present(alertController, animated: true, completion: nil)
         }
     }
     
     
-    
+    var resultstr: CLPlacemark!
     
     func fetchWeather(with location:String) {
-        let geocoder = CLGeocoder()
+        
         geocoder.geocodeAddressString(location) { (placemarks:[CLPlacemark]?, error:Error?) in
-            guard error == nil, let placemarksLocation = placemarks?.first?.location else {
-                self.showAlertView(withTitle: "Ошибка", andText: "Не удалось найти местоположение")
-                return
+            guard error == nil,
+                let placemarksLocation = placemarks?.first?.location,
+                let locality = placemarks?.first?.locality  else {
+                    self.showAlertView(withTitle: "Ошибка", andText: "Не удалось найти местоположение")
+                    return
             }
-            
+            self.resultstr = placemarks?.first
             let filteredArray = self.favoritesArray.filter( { (user: Weather) -> Bool in
-                return user.locationName ==  placemarks![0].name!
+                return user.locationName ==  locality
             })
             if !filteredArray.isEmpty {
-                CoreDataManager.fetchAsDictionary(data: filteredArray[0], completion: { (results) in
+                self.coreDataManager.fetchAsDictionary(data: filteredArray[0], completion: { (results) in
                     if let result = results {
                         DispatchQueue.main.async {
-                            self.output?.setData(data: result)
+                            self.delegate?.setData(data: result)
                             self.navigationController?.popViewController(animated: true)
                             return
                         }
                     }
                 })
             } else {
-                let url = APIManager.getPath(latitude: String(placemarksLocation.coordinate.latitude), longitude: String(placemarksLocation.coordinate.longitude))
+                let url = self.apiManager.getPath(latitude: String(placemarksLocation.coordinate.latitude), longitude: String(placemarksLocation.coordinate.longitude))
                 
-                NetworkService.getData(url: url, location: placemarks![0].name!, completion: { results in
-                    guard let result = results else {
-                        self.showAlertView(withTitle: "Ошибка", andText: "Не удалось загрузить данные")
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        self.output?.setData(data: result)
-                        self.navigationController?.popViewController(animated: true)
-                    }
+                NetworkService.getData(url: url,
+                                       location: locality,
+                                       longitude: String(placemarksLocation.coordinate.longitude),
+                                       latitude: String(placemarksLocation.coordinate.latitude),
+                                       completion: { results in
+                                        guard let result = results else {
+                                            self.showAlertView(withTitle: "Ошибка", andText: "Не удалось загрузить данные")
+                                            return
+                                        }
+                                        DispatchQueue.main.async {
+                                            self.delegate?.setData(data: result)
+                                            self.navigationController?.popViewController(animated: true)
+                                        }
                 })
             }
         }
@@ -159,7 +193,12 @@ extension SearchAndBookmarkController: UISearchBarDelegate {
         searchBar.endEditing(true)
         fetchWeather(with: searchBar.text!)
     }
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.showsCancelButton = false
+    }
 }
+
 
 extension SearchAndBookmarkController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -175,9 +214,9 @@ extension SearchAndBookmarkController: UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        CoreDataManager.fetchAsDictionary(data: favoritesArray[indexPath.row]) { (results) in
+        coreDataManager.fetchAsDictionary(data: favoritesArray[indexPath.row]) { (results) in
             if let result = results {
-                self.output?.setData(data: result)
+                self.delegate?.setData(data: result)
                 self.navigationController?.popViewController(animated: true)
             }
         }
@@ -192,8 +231,10 @@ extension SearchAndBookmarkController: UITableViewDelegate, UITableViewDataSourc
             guard let currentWeather = favoritesArray[indexPath.row].current?.array as? [CurrentWeather] else {
                 return cell
             }
+            
+            
             cell.backgroundColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
-            cell.location.text = currentWeather[0].location
+            cell.location.text = favoritesArray[indexPath.row].locationName
             cell.currentTemperature.text = String(currentWeather[0].temperature) + "°"
             cell.icon.image = UIImage(data: currentWeather[0].icon!)
             return cell

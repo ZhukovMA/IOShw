@@ -64,7 +64,7 @@ class WeatherCell: UITableViewCell {
         nightTempetature.rightAnchor.constraint(equalTo: rightAnchor, constant: -20).isActive = true
         
         afternoonTemperature.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        afternoonTemperature.rightAnchor.constraint(equalTo: rightAnchor, constant: -20).isActive = true
+        afternoonTemperature.rightAnchor.constraint(equalTo: nightTempetature.leftAnchor, constant: -20).isActive = true
         
     }
     

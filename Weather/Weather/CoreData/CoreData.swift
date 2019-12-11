@@ -9,22 +9,30 @@
 import UIKit
 import CoreData
 
+protocol CoreDataManagerProtocol {
+    func fetchAsDictionary(data: Weather, completion:  @escaping ([String: [Any]]?) -> Void)
+    func saveAsEntity(data: [String: [Any]], completion:  @escaping ([Weather]?) -> Void)
+    func update(data: [String: [Any]], completion: @escaping (Weather?) -> Void)
+    func retrieveData() -> [Weather]
+    func removeData(locationName: String, completion:  @escaping ([Weather]?) -> Void) 
+}
 
-class CoreDataManager{
-    
-    
-    
+class CoreDataManager: CoreDataManagerProtocol{
+    var appDelegate : AppDelegate!
     init() {
-        
+        appDelegate = UIApplication.shared.delegate as? AppDelegate
     }
     
-    static func fetchAsDictionary(data: Weather, completion:  @escaping ([String: [Any]]?) -> Void){
+    func fetchAsDictionary(data: Weather, completion:  @escaping ([String: [Any]]?) -> Void){
+        
+         //MARK: - Description
+        let description = DescriptionLocationModel(location: data.locationName!, longitude: data.longitude!, latitude: data.latitude!)
+        
         //MARK: - CurrentWeather
         let currentEntity = data.current?.array as! [CurrentWeather]
         let currentWeatherObject = CurrentWeatherModel(isFavorite: currentEntity[0].isFavorite,
                                                        temperature: currentEntity[0].temperature,
                                                        summary: currentEntity[0].summary!,
-                                                       location: currentEntity[0].location!,
                                                        pressure: currentEntity[0].pressure,
                                                        humidity: currentEntity[0].humidity,
                                                        icon: UIImage(data: currentEntity[0].icon!)!)
@@ -54,34 +62,36 @@ class CoreDataManager{
                                                          icon: UIImage(data: item.icon!)!))
         }
         
-        let weatherArray : [String: [Any]] = ["current": [currentWeatherObject],
+        let weatherArray : [String: [Any]] = ["description": [description],
+                                                "current": [currentWeatherObject],
                                               "hourly": hourlyWeatherObjects,
                                               "daily": dailyWeatherObjects ]
         completion(weatherArray)
     }
     
     
-    static func saveAsEntity(data: [String: [Any]], completion:  @escaping ([Weather]?) -> Void){
+    func saveAsEntity(data: [String: [Any]], completion:  @escaping ([Weather]?) -> Void){
         var weather: Weather!
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard appDelegate != nil  else { return }
         let currentWeatherObject = data["current"]![0] as! CurrentWeatherModel
-        
+        let descriptionObject = data["description"]![0] as! DescriptionLocationModel
         let context = appDelegate.persistentContainer.viewContext
         let fetchRequest: NSFetchRequest<Weather> = Weather.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "locationName == %@", currentWeatherObject.location)
+        fetchRequest.predicate = NSPredicate(format: "locationName == %@", descriptionObject.location)
         do {
             var results = try context.fetch(fetchRequest)
             
             if results.isEmpty {
                 
                 weather = Weather(context: context)
-                weather.locationName = currentWeatherObject.location
+                weather.locationName = descriptionObject.location
+                weather.longitude = descriptionObject.longitude
+                weather.latitude = descriptionObject.latitude
                 //MARK: - CurrentWeather
                 
                 let currentEntity = CurrentWeather(context: context)
                 currentEntity.humidity = currentWeatherObject.humidity
                 currentEntity.isFavorite = currentWeatherObject.isFavorite
-                currentEntity.location = currentWeatherObject.location
                 currentEntity.summary = currentWeatherObject.summary
                 currentEntity.pressure = currentWeatherObject.pressure
                 currentEntity.temperature = currentWeatherObject.temperature
@@ -111,7 +121,6 @@ class CoreDataManager{
                 weather.hourly = hourly
                 
                 //MARK: - DailyWeather
-                
                 let dailyWeatherObject = data["daily"] as! [DailyWeatherModel]
                 let daily = weather.daily?.mutableCopy() as? NSMutableOrderedSet
                 for item in dailyWeatherObject {
@@ -140,8 +149,85 @@ class CoreDataManager{
         
     }
     
-    static func retrieveData() -> [Weather]{
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return [] }
+
+    
+    func update(data: [String: [Any]], completion: @escaping (Weather?) -> Void) {
+        var weather: Weather!
+        guard appDelegate != nil  else { return }
+        let currentWeatherObject = data["current"]![0] as! CurrentWeatherModel
+        let descriptionObject = data["description"]![0] as! DescriptionLocationModel
+        let context = appDelegate.persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<Weather> = Weather.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "locationName == %@", descriptionObject.location)
+        do {
+            let results = try context.fetch(fetchRequest)
+            
+            if !results.isEmpty {
+                
+                weather = Weather(context: context)
+                weather.locationName = descriptionObject.location
+                weather.longitude = descriptionObject.longitude
+                weather.latitude = descriptionObject.latitude
+                //MARK: - CurrentWeather
+                
+                let currentEntity = CurrentWeather(context: context)
+                currentEntity.humidity = currentWeatherObject.humidity
+                currentEntity.isFavorite = true
+                currentEntity.summary = currentWeatherObject.summary
+                currentEntity.pressure = currentWeatherObject.pressure
+                currentEntity.temperature = currentWeatherObject.temperature
+                
+                let image = currentWeatherObject.icon
+                let imageData = image.pngData()
+                currentEntity.icon = imageData
+                
+                let current = weather.current?.mutableCopy() as? NSMutableOrderedSet
+                current?.add(currentEntity)
+                weather.current = current
+                
+                //MARK: - HourlyWeather
+                
+                let hourlyWeatherObject = data["hourly"] as! [HourlyWeatherModel]
+                let hourly = weather.hourly?.mutableCopy() as? NSMutableOrderedSet
+                for item in hourlyWeatherObject {
+                    let hourlyEntity = HourlyWeather(context: context)
+                    hourlyEntity.time = item.time
+                    hourlyEntity.temperature = item.temperature
+                    
+                    let image = item.icon
+                    let imageData = image.pngData()
+                    hourlyEntity.icon = imageData
+                    hourly?.add(hourlyEntity)
+                }
+                weather.hourly = hourly
+                
+                //MARK: - DailyWeather
+                let dailyWeatherObject = data["daily"] as! [DailyWeatherModel]
+                let daily = weather.daily?.mutableCopy() as? NSMutableOrderedSet
+                for item in dailyWeatherObject {
+                    let dailyEntity = DailyWeather(context: context)
+                    dailyEntity.time = item.time
+                    dailyEntity.temperatureHight = item.temperatureHigh
+                    dailyEntity.temperatureLow = item.temperatureLow
+                    
+                    let image = item.icon
+                    let imageData = image.pngData()
+                    dailyEntity.icon = imageData
+                    daily?.add(dailyEntity)
+                }
+                weather.daily = daily
+                completion(weather)
+            } else {
+                
+            }
+        } catch let error as NSError{
+            print(error.userInfo)
+        }
+    }
+    
+    func retrieveData() -> [Weather]{
+        guard appDelegate != nil  else { return  [] }
+        
         let сontext =  appDelegate.persistentContainer.viewContext
         
         let fetchRequest: NSFetchRequest<Weather> = Weather.fetchRequest()
@@ -152,12 +238,11 @@ class CoreDataManager{
             print("Failed")
             return []
         }
-        
     }
     
     
     
-    static func removeData(locationName: String, completion:  @escaping ([Weather]?) -> Void) {
+    func removeData(locationName: String, completion:  @escaping ([Weather]?) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         let fetchRequest: NSFetchRequest<Weather> = Weather.fetchRequest()

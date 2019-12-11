@@ -15,33 +15,46 @@ protocol MainControllerOutput {
 }
 
 
-class MainViewController: UIViewController, SearchAndBookmarkOutput, LocationManagerDelegate {
+class MainViewController: UIViewController, SearchAndBookmarkDelegate, LocationManagerDelegate {
     
-    var geopositionManager : GeopositionManager?
+    var geopositionManager : GeopositionManager!
     
     var output: MainControllerOutput?
     var scrollView: UIScrollView!
     var searchController = SearchAndBookmarkController()
     var weatherData = [String : [Any]]()
-    let tableView = UITableView()
+    var tableView = UITableView()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         geopositionManager = GeopositionManager()
-        geopositionManager?.delegate = self
+        geopositionManager.delegate = self
         searchController.mainViewController = self
         searchController.mainViewController?.output = searchController
-        searchController.output = self
+        searchController.delegate = self
         setupNavBar()
         setupTableView()
         
     }
     
     
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= keyboardSize.height
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        if self.view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+    }
     func setData(data: [String : [Any]])  {
-        let currentWeather =  data["current"]![0] as! CurrentWeatherModel
-        self.title = currentWeather.location
+        let descriptionWeather =  data["description"]![0] as! DescriptionLocationModel
+        self.title = descriptionWeather.location
         weatherData = data
         changeImageRightButton()
         tableView.contentOffset = CGPoint(x: 0, y: 0)
@@ -51,8 +64,8 @@ class MainViewController: UIViewController, SearchAndBookmarkOutput, LocationMan
     
     func setDataFromLocationManager(data: [String : [Any]]) {
         print(Thread.isMainThread)
-        let currentWeather =  data["current"]![0] as! CurrentWeatherModel
-        self.title = currentWeather.location
+        let descriptionWeather =  data["description"]![0] as! DescriptionLocationModel
+        self.title = descriptionWeather.location
         weatherData = data
         changeImageRightButton()
         tableView.contentOffset = CGPoint(x: 0, y: 0)
@@ -60,7 +73,7 @@ class MainViewController: UIViewController, SearchAndBookmarkOutput, LocationMan
         tableView.reloadData()
     }
     
-    private func setupNavBar() {
+    func setupNavBar() {
         let imagee = UIImage(named: "search")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: imagee, style: .plain, target: self, action: #selector(action))
         
@@ -104,7 +117,7 @@ class MainViewController: UIViewController, SearchAndBookmarkOutput, LocationMan
         navigationController?.pushViewController(searchController, animated: true)
     }
     
-    private func setupTableView() {
+    func setupTableView() {
         tableView.backgroundColor = #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1)
         tableView.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
         tableView.register(WeatherCell.self, forCellReuseIdentifier: "Cell")

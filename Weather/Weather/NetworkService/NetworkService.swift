@@ -8,6 +8,15 @@
 
 import Foundation
 
+struct DescriptionLocationModel {
+    let location: String
+    let longitude: String
+    let latitude: String
+}
+
+
+
+
 class NetworkService {
     
     
@@ -20,12 +29,13 @@ class NetworkService {
     
     
     
-    static func getData(url: URL, location: String, completion:  @escaping ([String: [Any]]?) -> Void) {
-        
+    static func getData(url: URL, location: String, longitude: String, latitude: String, completion:  @escaping ([String: [Any]]?) -> Void) {
+
         let request = URLRequest(url: url)
         
         let task = URLSession.shared.dataTask(with: request) { (data:Data?, response:URLResponse?, error:Error?) in
-            var weatherArray : [String: [Any]] = ["current": [],
+            var weatherArray : [String: [Any]] = ["description": [],
+                                                    "current": [],
                                                   "hourly": [],
                                                   "daily": []
             ]
@@ -43,7 +53,9 @@ class NetworkService {
                             return
                     }
                     
-                    guard let currentWeatherObject = CurrentWeatherModel(json: current, location: location) else {
+                   let description =  DescriptionLocationModel(location: location, longitude: longitude, latitude: latitude)
+                    weatherArray["description"]?.append(description)
+                    guard let currentWeatherObject = CurrentWeatherModel(json: current) else {
                         completion([:])
                         return
                     }
